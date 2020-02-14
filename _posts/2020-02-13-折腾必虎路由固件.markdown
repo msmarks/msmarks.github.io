@@ -1,0 +1,45 @@
+---
+layout: post
+title:  "折腾必虎路由固件"
+date:   2020-02-13 11:58:16 +0800
+#categories: router
+---
+最近折腾了回水系统，整套东西放在橱柜里面，WiFi似乎被金属的橱柜门挡住了，信号很弱，偶尔还掉线。
+
+翻出了好多年前的1代小米WiFi放大器。中继后信号不错。然而，两周后反复出现了小米WiFi放大器自己也掉线的情况，黄灯一直闪，也不见它尝试重连，只有断电后在上电才恢复。
+
+考虑到网上对小米的网络设备的稳定性评价不高。而且我自己还有一个比小米WiFi放大器年纪更大的TP-LINK TL-WR703N（5岁高龄），刷了openwrt为门外的摄像头中继，半年来从不重启一直很稳定，这使得我考虑是不是再去搞一个703N用作中继。
+
+查看了TP-LINK官网，TL-WR703N早就停产了，在卖的是TL-WR802N。查了下配置，FLASH只有2M，刷openwrt是不可能了。虽然可以自己换FLASH，但是一套下来，购买FLASH、焊接、编程器读写固件，也蛮折腾的。我只想搞个小的、功耗低、上手就能刷openwrt的路由器而已。
+
+自从用了ubnt的AP，家里网络覆盖的挺好的，好久没有关注现在新出的路由器了。发帖问了下[V2EX](https://www.v2ex.com/t/642231)，拿到了两个推荐的店铺，惊奇的发现，这么多年过去了，这类路由器还是TL-WR703N的那套方案。看来TL-WR703N还真是经典。
+
+然而……新冠期间，是没有店铺发货的。作罢。
+
+可是回水老是掉线，这问题得解决。
+
+又翻出一个老路由——必虎路由，也就是这次的主角。
+
+![必虎路由](../../../assets/img/bhu_1.png)
+
+当年买它是被它的颜值、还有宣称的1949平米覆盖、还有poe供电。但是事实上，后面使用下来并不大理想。直到换了ubnt的方案。
+
+
+
+
+
+
+
+{% highlight ruby %}
+def print_hi(name)
+  puts "Hi, #{name}"
+end
+print_hi('Tom')
+#=> prints 'Hi, Tom' to STDOUT.
+{% endhighlight %}
+
+Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
+
+[jekyll-docs]: https://jekyllrb.com/docs/home
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-talk]: https://talk.jekyllrb.com/
