@@ -163,8 +163,8 @@ gpio 22 蓝色Led
 gpio 12 红色Led
 gpio 17 Reset按钮
 ```
-在breed网页中，选择“环境变量设置”，点击"启用"，把位置设定为“自定义”，地址为`0x9F050000`，也就是“u-boot-env”位置。
-选择“环境变量编辑”，添加“gpio.customized.reset”为“17H”，将gpio 17设定为reset按键，这样以后就可以通过长按reset进入breed，而不用ttl。
+在breed网页中，选择“环境变量设置”，点击"启用"。
+选择“环境变量编辑”，添加`gpio.customized.reset`为`17H`，将gpio 17设定为reset按键，这样以后就可以通过长按reset进入breed，而不用ttl。
 
 后面就是刷入openwrt了，这里选择的是openwrt官网上的TP-Link tl-wr842n的固件，它们硬件类似。在官网上下载`openwrt-19.07.1-ath79-generic-tplink_tl-wr842n-v2-squashfs-factory.bin`，在breed上选择“固件更新”刷入就可以了。
 
