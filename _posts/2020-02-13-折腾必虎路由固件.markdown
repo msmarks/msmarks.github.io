@@ -4,6 +4,7 @@ title:  "折腾必虎路由固件"
 date:   2020-02-13 11:58:16 +0800
 #categories: router
 ---
+
 最近折腾了回水系统，整套东西放在橱柜里面，WiFi似乎被金属的橱柜门挡住了，信号很弱，偶尔还掉线。
 
 翻出了好多年前的1代小米WiFi放大器。中继后信号不错。然而，两周后反复出现了小米WiFi放大器自己也掉线的情况，黄灯一直闪，也不见它尝试重连，只有断电后在上电才恢复。
@@ -22,24 +23,167 @@ date:   2020-02-13 11:58:16 +0800
 
 ![必虎路由](../../../assets/img/bhu_1.png)
 
-当年买它是被它的颜值、还有宣称的1949平米覆盖、还有poe供电。但是事实上，后面使用下来并不大理想。直到换了ubnt的方案。
+当年买它是被它的颜值、还有宣称的1949平米覆盖、还有poe供电。但是事实上，后面使用下来并不大理想。当然，如果将它作为一个repeater，覆盖、性能这些都不重要。只是，官方的固件功能做的太少了，只能作为一个AP或者PPPoe上网，中继什么的是不存在的。
+
+先网上搜索下这个路由吧：
+
+* [Multiple Vulnerabilities in BHU WiFi “uRouter”](https://ioactive.com/multiple-vulnerabilities-in-bhu-wifi-urouter/) 
+* [必虎2无线路由刷OP固件无线功能无法开启问题](https://www.right.com.cn/forum/thread-206064-1-1.html)
+
+第一篇文章很有意思的，一个老外来中国买了这个路由器，回去一顿研究，惊奇的发现：
+1. 这个路由器的Web管理员密码是假的，可以通过构造cookies绕过。
+2. 这个路由器的ssh用户名和密码，是写死的。
+3. 这个路由可以通过POST的方式，用root权限远程执行任意命令。
+
+第一个我没什么兴趣。
+
+第二个的话，也许我可以通过ssh登录上这个路由器，通过命令行的方式开启中继模式。其用户名是`bhuroot`，密码是hash值`c050d85bc792583d9f6ae27b1d420786`。这个hash不容易反推，因此没什么利用价值。
+
+第三个，或许我可以利用它运行`useradd`命令添加一个用户。一波操作后，我发现这是徒劳的，这个漏洞应该已经被修复。
+
+第二篇文章虽然是一次失败的尝试，但是可以看出，这个路由运行openwrt还是有希望的。
+
+拆机吧！
+
+![必虎路由拆机](../../../assets/img/bhu_2.jpg)
+
+撬开后壳后看到是这样的：
+* 左上角有张tf卡。
+* 右下角是ttl接口，并且贴心的焊接好了排针。
+
+tf卡用胶粘在了PCB上。用刀刮下后，用读卡器读出，发现是fat32格式的。里面有一些日志文件，还有一个recovery.img文件。似乎recovery.img是固件，但是没能成功读取里面的内容。
+
+ttl就有意思了。用万用表确认了左边是3.3V，右边是GND，剩下的就是tx、rx。用[Black Magic Probe](https://github.com/blacksphere/blackmagic)连接到电脑。终端选择115200的波特率连接。
+
+启动后，打出了内核日志，其中包含了FLASH的地址信息：
+```
+Creating 7 MTD partitions on "ath-nor0":
+0x000000000000-0x000000040000 : "u-boot"
+0x000000040000-0x000000050000 : "u-boot-env"
+0x000000050000-0x0000001b0000 : "kernel"
+0x0000001b0000-0x0000009f0000 : "rootfs"
+mtd: partition "rootfs" set to be root filesystem
+mtd: partition "rootfs_data" created automatically, ofs=880000, len=170000
+0x000000880000-0x0000009f0000 : "rootfs_data"
+0x0000009f0000-0x000000b50000 : "kernel2"
+0x000000b50000-0x000000cf0000 : "rescure"
+0x000000cf0000-0x000000fd0000 : "Partition_006"
+```
+
+此外，开机时候按下任意键还可以进入U-Boot：
+```
+U-Boot 1.1.4 (Aug 19 2015 - 08:58:22)
+
+BHU Urouter
+...
+Stack Pointer at: 83f6bf98
+Now running in RAM - U-Boot at: 83fbc000
+Flash Manuf Id 0xc8, DeviceId0 0x40, DeviceId1 0x18
+flash size 16MB, sector count = 256
+Flash: 16 MB
+In:    serial
+Out:   serial
+Err:   serial
+
+ ______  _     _ _     _
+ |_____] |_____| |     |
+ |_____] |     | |_____| Networks Co'Ltd Inc.
+
+...
+
+Hit any key to stop autoboot:  1  0 
+
+##################################
+#   BHU Device bootloader menu   #
+##################################
+[1(t)] Upgrade firmware with tftp
+[2(h)] Upgrade firmware with httpd
+[3(a)] Config device and server IP Address
+[4(i)] Print device infomation
+[5(d)] Device test
+[6(l)] License manager
+[0(r)] Reboot device
+[ (c)] Enter to commad line
+Please input cmd key:
+```
+通过它的`Print device infomation`，我又拿到了更多信息：
+```
+boot_params = 0x83F6BFB0
+memstart    = 0x80000000
+memsize     = 0x04000000
+flashstart  = 0x9F000000
+flashsize   = 0x01000000
+flashoffset = 0x00038FD8
+ethaddr     = 00:AA:BB:CC:DD:EE
+ip_addr     = 192.168.62.1
+baudrate    = 115200 bps
+```
+综合上面的信息，可以知道：
+* 内存的起始地址是`0x80000000`，内存大小是`0x04000000`（64M）。
+* 闪存的起始地址是`0x9F000000`，闪存大小是`0x01000000`（16M）。
+* U-Boot的地址是`0x9F000000`~`0x9F040000`。
+按照openwrt官方的说明，19.07后，将不编译32M/8M的设备的image，因此必虎的配置（64M/16M）对openwrt来说是足够的。
+
+下面尝试把U-boot区域换成[breed](https://www.right.com.cn/forum/thread-161906-1-1.html)。
+
+必虎路由的CPU是Atheros AR9341。在[breed下载页面](https://breed.hackpascal.net/EOL/)，选择`breed-ar934x-blank-r1163.bin`版本。
+
+在U-Boot中，使用`printenv`，拿到`serverip`
+```
+CMD> printenv
+bootcmd=bootm 0x9f050000
+bootdelay=1
+baudrate=115200
+ipaddr=192.168.62.1
+serverip=192.168.62.10
+```
+用网线连接路由的Lan和电脑，将电脑IP改成`192.168.62.10`。电脑上运行tftp server，选择刚刚下载的breed文件夹。将`breed-ar934x-blank-r1163.bin`改名为`breed.bin`。
+
+然后开始刷入breed，如下图
+
+![刷入breed](../../../assets/img/bhu_3.png)
+
+在U-Boot中，首先将breed下载到内存中：
+```
+tftp 0x80000000 breed.bin
+```
+提示传输了`0x16ad6`字节。接着在闪存的U-Boot区域，擦除`0x16ad6`字节：
+```
+erase 0x9F000000 0x16ad6
+```
+最后，把内存中下载好的breed，复制到闪存中：
+```
+cp.b 0x80000000 0x9F000000 0x16ad6
+```
+完了断电重启，系统提示已经成功运行breed了，新的ip是`192.168.1.1`，按任意键进入breed。把电脑的ip改成`192.168.1.2`，打开浏览器访问`192.168.1.1`，可以看到breed界面。
+
+breed有两个命令用于测试gpio：`btntst`和`gpio`，前者用于测试reset按键，后者用于找到led灯。经过测试，分别是：
+```
+gpio 22 蓝色Led
+gpio 12 红色Led
+gpio 17 Reset按钮
+```
+在breed网页中，选择“环境变量设置”，点击"启用"，把位置设定为“自定义”，地址为`0x9F050000`，也就是“u-boot-env”位置。
+选择“环境变量编辑”，添加“gpio.customized.reset”为“17H”，将gpio 17设定为reset按键，这样以后就可以通过长按reset进入breed，而不用ttl。
+
+后面就是刷入openwrt了，这里选择的是openwrt官网上的TP-Link tl-wr842n的固件，它们硬件类似。在官网上下载`openwrt-19.07.1-ath79-generic-tplink_tl-wr842n-v2-squashfs-factory.bin`，在breed上选择“固件更新”刷入就可以了。
+
+重启后，就进入熟悉的openwrt了。
+
+但是毕竟wr842n和必虎硬件是有些差别的，在openwrt中：
+* “网络”->“交换机”有LAN1-LAN4四个接口，但是必虎只有一个LAN接口，测试实际对应于LAN4。
+* “系统”->“LED配置“，只有`tp-link:green:lan4`对应于红色灯是有效的。蓝色led没有控制方式。
+
+这些小问题，可以通过自己编译openwrt解决，不影响使用。
+
+顺带还可以把左上角的tf卡挂载了，安装下面的包就行。
+
+```
+kmod-usb-storage block-mount block-hotplug kmod-fs-ext4 kmod-fs-vfat kmod-nls-cp437 kmod-nls-iso8859-1
+```
+
+中继工作正常，完美！
+![中继WiFi](../../../assets/img/bhu_4.png)
 
 
 
-
-
-
-
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
-{% endhighlight %}
-
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
-
-[jekyll-docs]: https://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
