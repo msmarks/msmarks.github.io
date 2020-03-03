@@ -21,7 +21,7 @@ date:   2020-02-13 11:58:16 +0800
 
 又翻出一个老路由——必虎路由，也就是这次的主角。
 
-![必虎路由](../../../assets/img/bhu_1.png)
+![必虎路由]({{ site.url }}/assets/img/bhu_1.png)
 
 当年买它是被它的颜值、还有宣称的1949平米覆盖、还有poe供电。但是事实上，后面使用下来并不大理想。当然，如果将它作为一个repeater，覆盖、性能这些都不重要。只是，官方的固件功能做的太少了，只能作为一个AP或者PPPoe上网，中继什么的是不存在的。
 
@@ -45,7 +45,7 @@ date:   2020-02-13 11:58:16 +0800
 
 拆机吧！
 
-![必虎路由拆机](../../../assets/img/bhu_2.jpg)
+![必虎路由拆机]({{ site.url }}/assets/img/bhu_2.jpg)
 
 撬开后壳后看到是这样的：
 * 左上角有张tf卡。
@@ -141,7 +141,7 @@ serverip=192.168.62.10
 
 然后开始刷入breed，如下图
 
-![刷入breed](../../../assets/img/bhu_3.png)
+![刷入breed]({{ site.url }}/assets/img/bhu_3.png)
 
 在U-Boot中，首先将breed下载到内存中：
 ```
@@ -183,7 +183,7 @@ kmod-usb-storage block-mount block-hotplug kmod-fs-ext4 kmod-fs-vfat kmod-nls-cp
 ```
 
 中继工作正常，完美！
-![中继WiFi](../../../assets/img/bhu_4.png)
+![中继WiFi]({{ site.url }}/assets/img/bhu_4.png)
 
 
 
