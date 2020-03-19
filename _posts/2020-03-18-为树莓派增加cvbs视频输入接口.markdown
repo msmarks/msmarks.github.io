@@ -1,0 +1,39 @@
+---
+layout: post
+title:  "为树莓派增加cvbs视频输入接口"
+date:   2020-03-18 20:00:00 +0800
+#categories: router
+---
+
+cvbs，或者说是AV接口，是一个古老的模拟视频接口。但即使在最近买到的电视机上还能够看到。虽然分辨率低，一些有线电视机顶盒、汽车上的倒车摄像头、还是小区的门禁系统，仍然在用这种视频传输模式。即使是最新的树莓派4也保留着这个输出接口。
+
+我家的小区门禁系统是ABB的模拟对讲系统，为了将这个系统的视频信号接入智能家居，实现手机远程响应开门，于是调研了下树莓派输入cvbs的方案。
+
+在官方论坛上，6by9大神其实早在7年前，就[考虑过这个问题](https://www.raspberrypi.org/forums/viewtopic.php?t=221010)。他提到了adv7282m，是一颗模拟视频转CSI接口的芯片。使用树莓派的相机接口采集图像。
+
+更加深入看了下树莓派的内核源码，大神已经在[内核驱动和设备树上提供了对adv7282m的支持](https://github.com/raspberrypi/linux/commit/7a1a26f750c03102b4a16f85967f293ee271678c)。所以理论上只要有硬件，对系统稍加改动就可以直接利用起来。
+
+论坛上的大佬都是直接买了块[评估板](https://www.analog.com/cn/products/adv7282.html)直接开搞的。但是接近1000块的价格显然不被我所接受。好在评估版的电路图是公开的，adv7282m在淘宝上的拆机价格也就20块不到。于是打算自己做一块板子开搞。
+
+电路图就参照评估版来个最简设计吧。
+
+![电路图]({{ site.url }}/assets/img/adv7282_1.png)
+
+打样焊接
+
+![PCB]({{ site.url }}/assets/img/adv7282_2.png)
+
+连接到树莓派的CSI，然后再用另一台树莓派的av输出作为视频源。
+
+![连接树莓派]({{ site.url }}/assets/img/adv7282_3.png)
+
+软件方面，按照大神在代码里面留的线索，编辑`/boot/config.txt`，增加`dtoverlay=adv7282m`。然后重启后，顺利看到`/dev/video0`设备。
+
+接下来就是下载大神改造的[yavta](https://github.com/6by9/yavta)，编译后运行`./yavta --capture=1000 -n 3 --encode-to=file.h264 -f UYVY -m -T /dev/video0`开始采集。
+
+把采集到的file.h264传输到PC上，用potplayer就可以看到采集到图像啦。
+
+![采集图像]({{ site.url }}/assets/img/adv7282_4.png)
+
+画面还是很复古的。
+
