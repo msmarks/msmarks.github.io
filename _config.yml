@@ -29,8 +29,8 @@ url: "https://blog.mashm.in" # the base hostname & protocol for your site, e.g. 
 
 # Build settings
 theme: minima
-plugins:
-  - jekyll-feed
+plugins: []
+#  - jekyll-feed
 
 google_analytics: UA-42620011-2
 lang: zh-cn
