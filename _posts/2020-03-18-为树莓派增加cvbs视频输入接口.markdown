@@ -21,7 +21,7 @@ cvbs，或者说是AV接口，是一个古老的模拟视频接口。但即使�
 
 打样焊接
 
-![PCB]({{ site.url }}/assets/img/adv7282_2.png)
+![PCB]({{ site.url }}/assets/img/adv7282_2.jpg)
 
 连接到树莓派的CSI，然后再用另一台树莓派的av输出作为视频源。
 
@@ -33,7 +33,7 @@ cvbs，或者说是AV接口，是一个古老的模拟视频接口。但即使�
 
 把采集到的file.h264传输到PC上，用potplayer就可以看到采集到图像啦。
 
-![采集图像]({{ site.url }}/assets/img/adv7282_4.png)
+![采集图像]({{ site.url }}/assets/img/adv7282_4.jpg)
 
 画面还是很复古的。
 
