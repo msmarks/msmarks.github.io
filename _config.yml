@@ -23,7 +23,7 @@ title: 遗忘的笔记
 description: >- # this means to ignore newlines until "baseurl:"
   记录日常搞的事情
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://blog.mashm.in" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 #github_username:  jekyll
 
@@ -34,6 +34,9 @@ plugins:
 
 google_analytics: UA-42620011-2
 lang: zh-cn
+
+disqus:
+  shortname: blog-mashim-in
 
 # Exclude from processing.
 # The following items will not be processed, by default.
@@ -55,5 +58,3 @@ lang: zh-cn
 #   - vendor/gems/
 #   - vendor/ruby/
 
-disqus:
-  shortname: blog-mashim-in
