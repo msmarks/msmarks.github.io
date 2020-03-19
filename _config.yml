@@ -54,3 +54,6 @@ lang: zh-cn
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+disqus:
+  shortname: blog-mashim-in.disqus.com
