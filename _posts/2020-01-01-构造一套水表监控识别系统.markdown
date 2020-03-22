@@ -208,10 +208,31 @@ _________________________________________________________________
 总共90个EPOCH。
 
 验证AI的预测值和实际值，较为一致。
+
 ![验证]({{ site.url }}/assets/img/water_17.jpg)
 
+## 部署到树莓派
+由于官方tensorflow在arm处理器上不支持卷积运算，参考[这个项目](https://github.com/lhelontra/tensorflow-on-arm)，使用提供的`rpi_one.conf
+`重新编译tensorflow。
 
-（未完）
+将训练好的模型部署在树莓派上。为了方便查看，我将识别直接画在了图片通过mjpg协议传输给群晖。
+![预览]({{ site.url }}/assets/img/water_19.jpg)
+
+# 数据分析
+流量数据，通过WiFi传输给HomeAssistant储存，下图是典型的24小时流量图。其中，夜晚几乎没有流量，而白天多为短促的流量。
+
+![预览]({{ site.url }}/assets/img/water_18.jpg)
+
+从流量本身，可以使用模型判定是否需要进行漏水报警：
+
+- 夜间长时间大流量，很可能预示这出现爆管。
+- 夜间持续小流量，很可能出现渗漏。
+
+HomeAssistant的好处是可以和遍布家中的其他传感器联动，进而判断报警。
+
+- 通过homeAssistant的deviceTracker，可以知道家中是否有人，在无人的时候，出现流量，进行报警。
+
+
 
 
 
