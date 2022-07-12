@@ -6,7 +6,7 @@ slug: wsl2_buildrooot
 #categories: buildroot
 ---
 
-# libffi 出现 `config.log: No such file or directory`
+# 一、libffi 出现 `config.log: No such file or directory`
 
 认为libffi编译脚本在NTFS格式分区的时候，文件权限设置错误导致，解决方案是：https://github.com/libffi/libffi/issues/552
 ，修改`ax_enable_builddir.m4`文件：
@@ -15,7 +15,8 @@ slug: wsl2_buildrooot
 +test -f $srcdir/config.log   && cp $srcdir/config.log   .
 ```
 
-# 找不到文件`/usr/bin/install: cannot stat 'buildroot/output/host/aarch64-buildroot-linux-uclibc/sysroot/usr/share/terminfo/a/ansi': No such file or directory`
+
+# 二、找不到文件`/usr/bin/install: cannot stat 'buildroot/output/host/aarch64-buildroot-linux-uclibc/sysroot/usr/share/terminfo/a/ansi': No such file or directory`
 
 https://whycan.com/t_8194.html
 这个错误是编译脚本错误的把文件名设置成了ASCII码，上述帖子中给出的解决方案是：
@@ -43,4 +44,12 @@ define NCURSES_TARGET_CLEANUP_TERMINFO
 			$(TARGET_DIR)/usr/share/terminfo/$(t)
 	)
 endef
+```
+
+# 三、调整image大小的时候，报`Missing /etc/mtab`
+https://github.com/microsoft/WSL/issues/3984
+
+创建一个软连接可以绕过
+```bash
+ln -s /etc/mtab /proc/mounts
 ```
