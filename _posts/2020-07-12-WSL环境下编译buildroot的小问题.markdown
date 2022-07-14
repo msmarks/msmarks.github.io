@@ -53,3 +53,17 @@ https://github.com/microsoft/WSL/issues/3984
 ```bash
 ln -s /etc/mtab /proc/mounts
 ```
+
+# 四、windows下不区分文件名大小写
+https://p3terx.com/archives/problems-and-solutions-encountered-in-wsl-use-1.html
+
+使用`fsutil.exe`将目录标注为大小写敏感，如：
+
+```bash
+fsutil.exe file setCaseSensitiveInfo <path> enable
+```
+
+检查目录是否大小写敏感
+```bash
+fsutil.exe file queryCaseSensitiveInfo <path>
+```
